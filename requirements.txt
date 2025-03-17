@@ -1,0 +1,13 @@
+# requirements.txt
+fastapi
+uvicorn
+sqlalchemy
+python-dotenv
+passlib
+bcrypt
+pyjwt
+psycopg2-binary
+python-jose
+jinja2
+python-multipart
+email-validator

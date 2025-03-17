@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- editar_tarefa.html -->
+<form method="post" action="/tarefas/{{ tarefa.id }}/editar"
+  class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+  <div class="mb-4">
+    <label for="nome" class="block text-gray-700 text-sm font-bold mb-2">Nome:</label>
+    <input type="text" id="nome" name="nome" value="{{ tarefa.nome }}" required
+      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+  </div>
+
+  <div class="mb-4">
+    <label for="descricao" class="block text-gray-700 text-sm font-bold mb-2">Descrição:</label>
+    <textarea id="descricao" name="descricao" required
+      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ tarefa.descricao }}</textarea>
+  </div>
+
+  <div class="mb-4">
+    <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Status:</label>
+    <input type="checkbox" id="status" name="status" {% if tarefa.status %}checked{% endif %}
+      class="form-checkbox h-5 w-5 text-blue-600">
+  </div>
+
+  <button type="submit"
+    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+    Salvar
+  </button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Botão para voltar -->
+    <button onclick="window.history.back()"
+      class="inline-flex items-center px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 mb-6">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Voltar
+    </button>
+
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Editar Projeto</h1>
+
+    <!-- Formulário de edição de projeto -->
+    <form method="post" action="/projetos/{{ projeto.id }}/editar" class="bg-white p-6 rounded-lg shadow-md">
+      <div class="mb-4">
+        <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Projeto</label>
+        <input type="text" id="nome" name="nome" value="{{ projeto.nome }}"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          required>
+      </div>
+
+      <div class="mb-4">
+        <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição do Projeto</label>
+        <textarea id="descricao" name="descricao"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          required>{{ projeto.descricao }}</textarea>
+      </div>
+
+      <div class="flex justify-end">
+        <button type="submit"
+          class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          Salvar Alterações
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
