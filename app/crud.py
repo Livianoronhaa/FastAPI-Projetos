@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from . import models, schemas, auth
 from .auth import get_password_hash
 
-# Operações relacionadas ao usuário
+#usuário
 def get_usuario(db: Session, usuario_id: int):
     return db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
 
@@ -21,7 +21,7 @@ def create_usuario(db: Session, usuario: schemas.UsuarioCreate):
     db.refresh(db_usuario)
     return db_usuario
 
-# Operações relacionadas ao projeto
+#projeto
 def get_projeto(db: Session, projeto_id: int):
     return db.query(models.Projeto).filter(models.Projeto.id == projeto_id).first()
 
@@ -32,7 +32,7 @@ def create_projeto(db: Session, projeto: schemas.ProjetoCreate):
     db_projeto = models.Projeto(
         nome=projeto.nome,
         descricao=projeto.descricao,
-        usuario_id=projeto.usuario_id  # Associa o projeto ao usuário
+        usuario_id=projeto.usuario_id
     )
     db.add(db_projeto)
     db.commit()
@@ -59,7 +59,8 @@ def editar_projeto(db: Session, projeto_id: int, projeto: schemas.ProjetoUpdate)
         db.refresh(db_projeto)
     return db_projeto
 
-# Operações relacionadas à tarefa
+
+    #Tarefa
 def get_tarefas_por_projeto(db: Session, projeto_id: int):
     return db.query(models.Tarefa).filter(models.Tarefa.projeto_id == projeto_id).all()
 
@@ -76,7 +77,6 @@ def create_tarefa(db: Session, tarefa: schemas.TarefaCreate):
     db.refresh(db_tarefa)
     return db_tarefa
 
-
 def editar_tarefa(db: Session, tarefa_id: int, tarefa: schemas.TarefaUpdate):
     db_tarefa = db.query(models.Tarefa).filter(models.Tarefa.id == tarefa_id).first()
     if db_tarefa:
@@ -87,7 +87,6 @@ def editar_tarefa(db: Session, tarefa_id: int, tarefa: schemas.TarefaUpdate):
         db.refresh(db_tarefa)
     return db_tarefa
 
-    # Operações relacionadas à tarefa
 def excluir_tarefa(db: Session, tarefa_id: int):
     db_tarefa = db.query(models.Tarefa).filter(models.Tarefa.id == tarefa_id).first()
     if db_tarefa:

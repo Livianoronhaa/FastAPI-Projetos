@@ -1,5 +1,4 @@
-# app/models.py
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey  # Adicione Text aquifrom sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey
 from .database import Base
 
 class Usuario(Base):
@@ -15,7 +14,7 @@ class Projeto(Base):
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String, nullable=False)
     descricao = Column(Text, nullable=False)
-    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)  # Relação com o usuário
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False) 
 
 
 class Tarefa(Base):
@@ -23,6 +22,6 @@ class Tarefa(Base):
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String, nullable=False)
     descricao = Column(Text, nullable=False)
-    status = Column(Boolean, default=False)  # False = Pendente, True = Concluída
+    status = Column(Boolean, default=False)
     projeto_id = Column(Integer, ForeignKey("projetos.id"), nullable=False)
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)

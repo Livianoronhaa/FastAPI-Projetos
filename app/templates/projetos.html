@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-100 p-8">
+<div class="min-h-screen bg-purple-100 p-8">
   <div class="max-w-4xl mx-auto">
-    <!-- Botão para voltar -->
+    <!-- Botão voltar -->
     <button onclick="window.history.back()"
-      class="inline-flex items-center px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 mb-6">
+      class="inline-flex items-center px-4 py-2 text-purple-400 font-regular rounded-md hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-6">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -13,12 +13,12 @@
       Voltar
     </button>
 
-    <!-- Título com o nome do usuário -->
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Olá, {{ user.nome }}, esses são seus projetos e tarefas!</h1>
 
-    <!-- Botão para adicionar projeto -->
+    <h1 class="text-3xl font-bold text-purple-800 mb-6">Olá, {{ user.nome }}, esses são seus projetos e tarefas!</h1>
+
+    <!-- Adicionar projeto -->
     <a href="/criar-projeto"
-      class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6">
+      class="inline-flex items-center px-4 py-2 bg-purple-800 text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-6">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -26,24 +26,20 @@
       Adicionar Projeto
     </a>
 
-    <!-- Lista de projetos e tarefas -->
     <div class="space-y-6">
       {% for projeto_tarefas in projetos_com_tarefas %}
-      <div class="bg-white p-6 rounded-lg shadow-md relative"> <!-- Adicionei "relative" aqui -->
-        <!-- Botão para excluir projeto no canto superior direito -->
-        <div>
+      <div class="bg-white p-6 rounded-lg shadow-md relative">
 
-        </div>
+        <!-- editar projeto -->
         <a href="/projetos/{{ projeto_tarefas.projeto.id }}/editar"
-          class="absolute top-4 right-20 text-blue-600 hover:text-blue-800">
+          class="absolute top-4 right-10 text-blue-600 hover:text-blue-800">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
             </path>
           </svg>
         </a>
-
-        <!-- Botão para excluir projeto no canto superior direito -->
+        <!-- excluir projeto -->
         <button onclick="excluirProjeto(event, {{ projeto_tarefas.projeto.id }})"
           class="absolute top-4 right-4 text-red-600 hover:text-red-800">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -53,47 +49,49 @@
           </svg>
         </button>
 
-        <!-- Nome e descrição do projeto -->
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ projeto_tarefas.projeto.nome }}</h2>
+        <h2 class="text-xl font-semibold text-purple-800 mb-4">{{ projeto_tarefas.projeto.nome }}</h2>
         <p class="text-gray-600 mb-4">{{ projeto_tarefas.projeto.descricao }}</p>
-
         <hr class="p-8">
-        <!-- Botão para adicionar tarefa -->
-        <a href="/criar-tarefa?projeto_id={{ projeto_tarefas.projeto.id }}"
-          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Adicionar Tarefa
-        </a>
+
 
         <!-- Lista de tarefas -->
-        <h3 class="text-lg font-semibold text-gray-700 mb-2">Tarefas</h3>
+        <h3 class="text-lg font-semibold text-purple-800 mb-2">Tarefas</h3>
+        <!-- Ddicionar tarefa -->
+        <a href="/criar-tarefa?projeto_id={{ projeto_tarefas.projeto.id }}"
+          class="inline-flex items-center px-2 py-2 bg-purple-400 text-white font-semibold rounded-full hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+        </a>
         <ul class="space-y-2">
           {% for tarefa in projeto_tarefas.tarefas %}
-          <li class="p-4 rounded-lg bg-green-50">
+          <li class="p-4 rounded-lg bg-purple-50">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-gray-800">{{ tarefa.nome }}</p>
+                <p class="text-purple-800">{{ tarefa.nome }}</p>
                 <p class="text-sm text-gray-600">{{ tarefa.descricao }}</p>
               </div>
+              <!--Editar tarefa -->
               <div class="flex space-x-2">
-                <a href="/tarefas/{{ tarefa.id }}/editar" class="text-sm font-semibold text-blue-600"> <svg
-                    class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                <a href="/tarefas/{{ tarefa.id }}/editar"
+                  class="text-sm font-semibold text-blue-600 hover:text-blue-800">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
                     </path>
-                  </svg></a>
+                  </svg>
+                </a>
+                <!--excluir tarefa -->
                 <form onsubmit="excluirTarefa(event, {{ tarefa.id }})" class="inline">
-                  <button type="submit" class="text-sm font-semibold text-red-600 hover:text-red-800"><svg
-                      class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  <button type="submit" class="text-sm font-semibold text-red-600 hover:text-red-800">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                       xmlns="http://www.w3.org/2000/svg">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                       </path>
-                    </svg></button>
+                    </svg>
+                  </button>
                 </form>
               </div>
             </div>
@@ -108,16 +106,16 @@
 
 <script>
   function excluirTarefa(event, tarefaId) {
-    event.preventDefault(); // Impede o envio padrão do formulário
+    event.preventDefault();
     fetch(`/tarefas/${tarefaId}/excluir`, {
-      method: 'DELETE', // Usa o método DELETE
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
     })
       .then(response => {
         if (response.ok) {
-          window.location.reload(); // Recarrega a página após a exclusão
+          window.location.reload();
         } else {
           alert('Erro ao excluir a tarefa');
         }
@@ -126,17 +124,17 @@
   }
 
   function excluirProjeto(event, projetoId) {
-    event.preventDefault(); // Impede o comportamento padrão do botão
+    event.preventDefault();
     if (confirm("Tem certeza que deseja excluir este projeto?")) {
       fetch(`/projetos/${projetoId}/excluir`, {
-        method: 'DELETE', // Usa o método DELETE
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
       })
         .then(response => {
           if (response.ok) {
-            window.location.reload(); // Recarrega a página após a exclusão
+            window.location.reload();
           } else {
             alert('Erro ao excluir o projeto');
           }

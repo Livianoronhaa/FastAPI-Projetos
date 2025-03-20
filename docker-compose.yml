@@ -1,6 +1,5 @@
 
 services:
-  # Serviço do FastAPI
   app:
     build: .
     ports:
@@ -8,21 +7,21 @@ services:
     volumes:
       - .:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:12345@db:5432/bancoo  # Usa a porta 5432 no contêiner
+      - DATABASE_URL=postgresql://postgres:12345@db:5432/bancoo 
     depends_on:
       db:
         condition: service_healthy
 
-  # Serviço do PostgreSQL
+
   db:
     image: postgres:17.2
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 12345
       POSTGRES_DB: bancoo
-      POSTGRES_HOST_AUTH_METHOD: trust  # Facilita a autenticação durante o desenvolvimento
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      - '5433:5432'  # Mapeia a porta 5432 do contêiner para a 5433 do host
+      - '5433:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -31,6 +30,5 @@ services:
       timeout: 5s
       retries: 5
 
-# Volume para persistir os dados do PostgreSQL
 volumes:
   postgres_data:

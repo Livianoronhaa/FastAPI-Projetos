@@ -1,31 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- editar_tarefa.html -->
-<form method="post" action="/tarefas/{{ tarefa.id }}/editar"
-  class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-  <div class="mb-4">
-    <label for="nome" class="block text-gray-700 text-sm font-bold mb-2">Nome:</label>
-    <input type="text" id="nome" name="nome" value="{{ tarefa.nome }}" required
-      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-  </div>
-
-  <div class="mb-4">
-    <label for="descricao" class="block text-gray-700 text-sm font-bold mb-2">Descrição:</label>
-    <textarea id="descricao" name="descricao" required
-      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ tarefa.descricao }}</textarea>
-  </div>
-
-  <div class="mb-4">
-    <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Status:</label>
-    <input type="checkbox" id="status" name="status" {% if tarefa.status %}checked{% endif %}
-      class="form-checkbox h-5 w-5 text-blue-600">
-  </div>
-
-  <button type="submit"
-    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-    Salvar
+<div class="min-h-screen bg-purple-100 p-8">
+  <!-- Botão para voltar -->
+  <button onclick="window.history.back()"
+    class="inline-flex items-center px-4 py-2 text-purple-400 font-regular rounded-md hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-6">
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Voltar
   </button>
-</form>
 
+  <form method="post" action="/tarefas/{{ tarefa.id }}/editar"
+    class="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div class="mb-4">
+      <label for="nome" class="block text-gray-700 text-sm font-bold mb-2">Nome:</label>
+      <input type="text" id="nome" name="nome" value="{{ tarefa.nome }}" required
+        class="shadow appearance-none border border-purple-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+    </div>
+
+    <div class="mb-4">
+      <label for="descricao" class="block text-gray-700 text-sm font-bold mb-2">Descrição:</label>
+      <textarea id="descricao" name="descricao" required
+        class="shadow appearance-none border border-purple-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-purple-500 focus:border-purple-500">{{ tarefa.descricao }}</textarea>
+    </div>
+
+    <div class="mb-4">
+      <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Status:</label>
+      <input type="checkbox" id="status" name="status" {% if tarefa.status %}checked{% endif %}
+        class="form-checkbox h-5 w-5 text-purple-600 focus:ring-purple-500">
+    </div>
+
+    <button type="submit"
+      class="bg-purple-800 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
+      Salvar
+    </button>
+  </form>
+</div>
 {% endblock %}
