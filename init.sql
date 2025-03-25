@@ -1,1 +1,1 @@
-CREATE DATABASE bancoo;
+CREATE DATABASE meubanco;

@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey
+from sqlalchemy import Enum, Column, Integer, String, Text, Boolean, ForeignKey
 from .database import Base
+from enum import Enum as PythonEnum
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -17,6 +18,11 @@ class Projeto(Base):
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False) 
 
 
+class Prioridade(str, PythonEnum):
+    BAIXA = 'baixa'
+    MEDIA = 'media'
+    ALTA = 'alta'
+    
 class Tarefa(Base):
     __tablename__ = "tarefas"
     id = Column(Integer, primary_key=True, index=True)
@@ -25,3 +31,8 @@ class Tarefa(Base):
     status = Column(Boolean, default=False)
     projeto_id = Column(Integer, ForeignKey("projetos.id"), nullable=False)
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+    prioridade = Column(
+        Enum('baixa', 'media', 'alta', name='prioridade_enum'),
+        server_default='baixa',  # Mude default para server_default
+        nullable=False
+    )

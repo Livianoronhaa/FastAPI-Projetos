@@ -172,7 +172,11 @@ async def exibir_formulario_editar_projeto(request: Request, projeto_id: int, db
 
 @app.get("/criar-tarefa", response_class=HTMLResponse)
 async def exibir_formulario_criar_tarefa(request: Request, projeto_id: int, db: Session = Depends(get_db)):
-    return templates.TemplateResponse("criar_tarefa.html", {"request": request, "projeto_id": projeto_id})
+    return templates.TemplateResponse("criar_tarefa.html", {
+        "request": request, 
+        "projeto_id": projeto_id,
+        "prioridades": ["baixa", "media", "alta"]  # Adicione esta linha
+    })
 
 @app.post("/criar-tarefa", response_class=RedirectResponse)
 async def criar_tarefa(
@@ -180,6 +184,7 @@ async def criar_tarefa(
     nome: str = Form(...),
     descricao: str = Form(...),
     projeto_id: int = Form(...),
+    prioridade: str = Form(...),  # Adicione este parâmetro
     db: Session = Depends(get_db)
 ):
     access_token = request.cookies.get("access_token")
@@ -200,6 +205,7 @@ async def criar_tarefa(
             nome=nome,
             descricao=descricao,
             projeto_id=projeto_id,
+            prioridade=prioridade,  # Adicione esta linha
             usuario_id=user.id
         )
         crud.create_tarefa(db, nova_tarefa)
@@ -254,6 +260,7 @@ async def editar_tarefa(
     tarefa_id: int,
     nome: str = Form(...),
     descricao: str = Form(...),
+    prioridade: str = Form(...),
     status: bool = Form(...),
     db: Session = Depends(get_db)
 ):
@@ -271,7 +278,7 @@ async def editar_tarefa(
         if user is None:
             raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
-        tarefa_atualizada = schemas.TarefaUpdate(nome=nome, descricao=descricao, status=status)
+        tarefa_atualizada = schemas.TarefaUpdate(nome=nome, descricao=descricao, status=status, prioridade=prioridade)
         crud.editar_tarefa(db, tarefa_id=tarefa_id, tarefa=tarefa_atualizada)
 
         redirect_url = f"/projetos?access_token={access_token}"

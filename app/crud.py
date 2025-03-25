@@ -70,7 +70,8 @@ def create_tarefa(db: Session, tarefa: schemas.TarefaCreate):
         descricao=tarefa.descricao,
         status=tarefa.status,
         projeto_id=tarefa.projeto_id,
-        usuario_id=tarefa.usuario_id
+        usuario_id=tarefa.usuario_id,
+        prioridade=tarefa.prioridade.value if hasattr(tarefa.prioridade, 'value') else tarefa.prioridade
     )
     db.add(db_tarefa)
     db.commit()

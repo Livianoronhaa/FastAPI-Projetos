@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from enum import Enum 
 
 class UsuarioBase(BaseModel):
     nome: str
@@ -12,9 +13,6 @@ class UsuarioResponse(UsuarioBase):
 
     class Config:
         from_attributes = True
-
-
-
 
 
 class ProjetoBase(BaseModel):
@@ -36,13 +34,18 @@ class ProjetoUpdate(BaseModel):
     descricao: str
 
 
-        
+class Prioridade(str, Enum):
+    baixa = "baixa"
+    media = "media"
+    alta = "alta"
+       
 class TarefaBase(BaseModel):
     nome: str
     descricao: str
     status: bool = False
     projeto_id: int
     usuario_id: int
+    prioridade: Prioridade = Prioridade.baixa
 
 class TarefaCreate(TarefaBase):
     pass
