@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -10,8 +10,50 @@
     <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
 </head>
 
-<body>
-    {% block content %}{% endblock %}
+
+<body class="bg-purple-50">
+    {% if show_nav is defined and show_nav %}
+    <nav class="bg-purple-300 shadow-sm border-b border-purple-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex justify-center">
+                        <img src="/static/assets/logo1.svg" class="w-28 m-4 mr-12" alt="">
+                    </div> <a href="/projetos"
+                        class="{{ 'bg-purple-600 text-white' if request.url.path.startswith('/projetos') else 'text-gray-700 hover:bg-purple-50' }} px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                        <i class="fas fa-project-diagram"></i>Projetos
+                    </a>
+                    <a href="/perfil"
+                        class="{{ 'bg-purple-600 text-white' if request.url.path.startswith('/perfil') else 'text-gray-700 hover:bg-purple-50' }} px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                        <i class="fas fa-user"></i>Perfil
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-700 text-sm font-medium">
+                        <i class="fas fa-user-circle mr-1 text-purple-600"></i> {{ user.nome if user else 'Usuário' }}
+                    </span>
+                    <form action="/logout" method="post">
+                        <button type="submit"
+                            class="flex items-center text-red-600 hover:text-red-800 text-sm font-medium transition duration-150 ease-in-out">
+                            <i class="fas fa-sign-out-alt mr-1"></i> Sair
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-white border-t border-purple-100 mt-4 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            &copy; 2023 Gestão de Projetos. Todos os direitos reservados.
+        </div>
+    </footer>
 </body>
 
 </html>

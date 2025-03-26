@@ -98,3 +98,40 @@ def excluir_tarefa(db: Session, tarefa_id: int):
 
 def get_tarefa(db: Session, tarefa_id: int):
     return db.query(models.Tarefa).filter(models.Tarefa.id == tarefa_id).first()
+
+
+
+
+
+def get_projetos_count(db: Session, usuario_id: int):
+    return db.query(models.Projeto).filter(models.Projeto.usuario_id == usuario_id).count()
+
+def get_tarefas_count(db: Session, usuario_id: int):
+    return db.query(models.Tarefa).filter(models.Tarefa.usuario_id == usuario_id).count()
+
+def get_tarefas_concluidas_count(db: Session, usuario_id: int):
+    return db.query(models.Tarefa).filter(
+        models.Tarefa.usuario_id == usuario_id,
+        models.Tarefa.status == True  # Note que no seu modelo o campo é 'status' não 'concluida'
+    ).count()
+
+def get_tarefas_por_prioridade(db: Session, usuario_id: int):
+    return {
+        'alta': db.query(models.Tarefa).filter(
+            models.Tarefa.usuario_id == usuario_id,
+            models.Tarefa.prioridade == 'alta'
+        ).count(),
+        'media': db.query(models.Tarefa).filter(
+            models.Tarefa.usuario_id == usuario_id,
+            models.Tarefa.prioridade == 'media'
+        ).count(),
+        'baixa': db.query(models.Tarefa).filter(
+            models.Tarefa.usuario_id == usuario_id,
+            models.Tarefa.prioridade == 'baixa'
+        ).count()
+    }
+
+def get_tarefas_recentes(db: Session, usuario_id: int, limit: int = 5):
+    return db.query(models.Tarefa).filter(
+        models.Tarefa.usuario_id == usuario_id
+    ).order_by(models.Tarefa.id.desc()).limit(limit).all()
