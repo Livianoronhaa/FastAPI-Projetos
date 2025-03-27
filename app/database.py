@@ -1,18 +1,14 @@
-import os
-from dotenv import load_dotenv
+# app/database.py
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-load_dotenv()
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:12345@db:5432/meubanco"
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise ValueError("ERRO: A variável DATABASE_URL não foi carregada corretamente!")
-
-engine = create_engine(DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+
+Base = declarative_base()  # Definido aqui
 
 def get_db():
     db = SessionLocal()

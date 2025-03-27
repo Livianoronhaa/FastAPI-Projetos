@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from . import models, schemas, auth
-from .auth import get_password_hash
+from .. import models, schemas
+from ..auth import get_password_hash
 
 #usuário
 def get_usuario(db: Session, usuario_id: int):
@@ -42,9 +42,7 @@ def create_projeto(db: Session, projeto: schemas.ProjetoCreate):
 def excluir_projeto(db: Session, projeto_id: int):
     db_projeto = db.query(models.Projeto).filter(models.Projeto.id == projeto_id).first()
     if db_projeto:
-        # Exclui todas as tarefas associadas ao projeto
         db.query(models.Tarefa).filter(models.Tarefa.projeto_id == projeto_id).delete()
-        # Exclui o projeto
         db.delete(db_projeto)
         db.commit()
         return True
@@ -99,6 +97,14 @@ def excluir_tarefa(db: Session, tarefa_id: int):
 def get_tarefa(db: Session, tarefa_id: int):
     return db.query(models.Tarefa).filter(models.Tarefa.id == tarefa_id).first()
 
+def atualizar_status_tarefa(db: Session, tarefa_id: int, status: bool):
+    db_tarefa = db.query(models.Tarefa).filter(models.Tarefa.id == tarefa_id).first()
+    if not db_tarefa:
+        return False
+    db_tarefa.status = status
+    db.commit()
+    db.refresh(db_tarefa)
+    return True
 
 
 
