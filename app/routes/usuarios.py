@@ -6,8 +6,11 @@ from ..database import get_db
 from ..auth import SECRET_KEY, ALGORITHM, get_current_user
 from jose import JWTError, jwt
 from ..config import templates
+from .. import schemas, models
+from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @router.get("/perfil", response_class=HTMLResponse)
 async def perfil(
@@ -51,4 +54,36 @@ async def perfil(
             }
         )
     except JWTError as e:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado")
+
+@router.put("/usuarios/me")
+async def editar_perfil(
+    usuario_update: schemas.UsuarioUpdate,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme)
+):
+    try:
+        # Decodificar o token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            raise HTTPException(status_code=401, detail="Token inválido")
+        
+        # Buscar usuário
+        user = crud.get_usuario_by_email(db, email=email)
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+        # Atualizar usuário
+        updated_user = crud.editar_usuario(db, user.id, usuario_update)
+        
+        return {
+            "user": {
+                "id": updated_user.id,
+                "nome": updated_user.nome,
+                "email": updated_user.email
+            }
+        }
+        
+    except JWTError:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")

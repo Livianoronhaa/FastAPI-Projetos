@@ -10,10 +10,9 @@ from ..config import templates
 
 router = APIRouter()
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
-
 @router.post("/login", response_class=RedirectResponse)
 async def login(
     email: str = Form(...),

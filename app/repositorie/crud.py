@@ -21,6 +21,21 @@ def create_usuario(db: Session, usuario: schemas.UsuarioCreate):
     db.refresh(db_usuario)
     return db_usuario
 
+
+def editar_usuario(db: Session, usuario_id: int, usuario: schemas.UsuarioUpdate):
+    db_usuario = db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
+    if db_usuario:
+        if usuario.nome:
+            db_usuario.nome = usuario.nome
+        if usuario.email:
+            db_usuario.email = usuario.email
+        if usuario.senha:
+            db_usuario.senha_hash = get_password_hash(usuario.senha)
+        db.commit()
+        db.refresh(db_usuario)
+    return db_usuario
+
+    
 #projeto
 def get_projeto(db: Session, projeto_id: int):
     return db.query(models.Projeto).filter(models.Projeto.id == projeto_id).first()

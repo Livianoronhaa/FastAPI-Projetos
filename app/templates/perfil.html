@@ -15,10 +15,10 @@
           <p class="text-purple-100">{{ user.email if user else 'email@exemplo.com' }}</p>
         </div>
       </div>
-      <a href="/perfil/editar"
+      <button onclick="openEditModal()"
         class="mt-4 sm:mt-0 bg-white text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
         <i class="fas fa-edit mr-1"></i> Editar Perfil
-      </a>
+      </button>
     </div>
   </div>
 
@@ -91,13 +91,13 @@
                 <p class="text-xs text-gray-500">
                   Prioridade:
                   <span class="
-                                        {% if tarefa.prioridade == 'alta' %}
-                                            text-red-600
-                                        {% elif tarefa.prioridade == 'media' %}
-                                            text-yellow-600
-                                        {% else %}
-                                            text-green-600
-                                        {% endif %}">
+                    {% if tarefa.prioridade == 'alta' %}
+                        text-red-600
+                    {% elif tarefa.prioridade == 'media' %}
+                        text-yellow-600
+                    {% else %}
+                        text-green-600
+                    {% endif %}">
                     {{ tarefa.prioridade }}
                   </span>
                 </p>
@@ -113,4 +113,132 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de Edição de Perfil -->
+<div id="editModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Fundo escuro -->
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75" onclick="closeEditModal()"></div>
+    </div>
+
+    <!-- Conteúdo do Modal -->
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+              <i class="fas fa-user-edit text-purple-600 mr-2"></i> Editar Perfil
+            </h3>
+            <form id="editProfileForm" class="space-y-4">
+              <div>
+                <label for="editNome" class="block text-sm font-medium text-gray-700">Nome</label>
+                <input type="text" id="editNome" value="{{ user.nome if user else '' }}"
+                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+              </div>
+
+              <div>
+                <label for="editEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="editEmail" value="{{ user.email if user else '' }}"
+                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+              </div>
+
+              <div>
+                <label for="editSenha" class="block text-sm font-medium text-gray-700">Nova Senha (opcional)</label>
+                <input type="password" id="editSenha" placeholder="Deixe em branco para não alterar"
+                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" onclick="submitEditForm()"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm">
+          Salvar Alterações
+        </button>
+        <button type="button" onclick="closeEditModal()"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Funções para controlar o modal
+  function openEditModal() {
+    document.getElementById('editModal').classList.remove('hidden');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+  }
+
+  async function submitEditForm() {
+    const nome = document.getElementById('editNome').value;
+    const email = document.getElementById('editEmail').value;
+    const senha = document.getElementById('editSenha').value;
+
+    // Validar campos obrigatórios
+    if (!nome || !email) {
+      alert('Nome e email são obrigatórios!');
+      return;
+    }
+
+    try {
+      // Obter o token do cookie de forma mais robusta
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('access_token='))
+        ?.split('=')[1];
+
+      if (!token) {
+        alert('Sessão expirada. Redirecionando para login...');
+        window.location.href = '/login';
+        return;
+      }
+
+      const response = await fetch('/usuarios/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          nome: nome,
+          email: email,
+          senha: senha || undefined // Envia undefined se senha estiver vazia
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Erro ao atualizar perfil');
+      }
+
+      const result = await response.json();
+
+      // Atualiza a UI
+      document.querySelector('.text-2xl.font-bold').textContent = result.user.nome;
+      document.querySelector('.text-purple-100').textContent = result.user.email;
+      document.querySelector('.text-4xl.font-bold').textContent = result.user.nome[0];
+
+      closeEditModal();
+      alert('Perfil atualizado com sucesso!');
+
+    } catch (error) {
+      console.error('Erro:', error);
+      alert(error.message || 'Erro ao atualizar perfil');
+    }
+  }
+
+  // Fechar modal com ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeEditModal();
+  });
+</script>
 {% endblock %}
