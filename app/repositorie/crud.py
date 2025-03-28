@@ -156,3 +156,50 @@ def get_tarefas_recentes(db: Session, usuario_id: int, limit: int = 5):
     return db.query(models.Tarefa).filter(
         models.Tarefa.usuario_id == usuario_id
     ).order_by(models.Tarefa.id.desc()).limit(limit).all()
+
+
+
+def compartilhar_projeto(db: Session, projeto_id: int, usuario_email: str, permissoes: str):
+    projeto = db.query(models.Projeto).filter(models.Projeto.id == projeto_id).first()
+    if not projeto:
+        return None
+    
+    usuario = get_usuario_by_email(db, email=usuario_email)
+    if not usuario:
+        return None
+    
+    existente = db.query(models.ProjetoCompartilhado).filter(
+        models.ProjetoCompartilhado.projeto_id == projeto_id,
+        models.ProjetoCompartilhado.usuario_id == usuario.id
+    ).first()
+    
+    if existente:
+        return None
+    
+    db_compartilhamento = models.ProjetoCompartilhado(
+        projeto_id=projeto_id,
+        usuario_id=usuario.id,
+        permissoes=permissoes
+    )
+    
+    db.add(db_compartilhamento)
+    db.commit()
+    db.refresh(db_compartilhamento)
+    return db_compartilhamento
+
+def get_projetos_compartilhados(db: Session, usuario_id: int):
+    return db.query(models.Projeto).join(
+        models.ProjetoCompartilhado,
+        models.ProjetoCompartilhado.projeto_id == models.Projeto.id
+    ).filter(
+        models.ProjetoCompartilhado.usuario_id == usuario_id
+    ).all()
+
+def get_projetos_do_usuario(db: Session, usuario_id: int):
+    projetos_proprios = db.query(models.Projeto).filter(
+        models.Projeto.usuario_id == usuario_id
+    ).all()
+    
+    projetos_compartilhados = get_projetos_compartilhados(db, usuario_id)
+    
+    return projetos_proprios + projetos_compartilhados

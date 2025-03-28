@@ -1,5 +1,5 @@
 from .usuario import Usuario
-from .projeto import Projeto
+from .projeto import Projeto, ProjetoCompartilhado
 from .tarefa import Tarefa, Prioridade
 from app.database import Base
 

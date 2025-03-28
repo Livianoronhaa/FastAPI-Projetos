@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Compartilhar Projeto: {{ projeto.nome }}</h2>
+
+  <form method="post" action="/projetos/{{ projeto.id }}/compartilhar">
+    <div class="mb-3">
+      <label for="email_usuario" class="form-label">Email do Usuário</label>
+      <input type="email" class="form-control" id="email_usuario" name="email_usuario" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="permissoes" class="form-label">Permissões</label>
+      <select class="form-select" id="permissoes" name="permissoes">
+        <option value="leitura">Somente Leitura</option>
+        <option value="edicao">Edição</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Compartilhar</button>
+    <a href="/projetos" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

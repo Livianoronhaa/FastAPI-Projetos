@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Projeto: {{ projeto.nome }}</h2>
+  <h3>Usuários com acesso</h3>
+
+  <a href="/projetos/{{ projeto.id }}/compartilhar" class="btn btn-primary mb-3">
+    Compartilhar com outro usuário
+  </a>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Usuário</th>
+        <th>Permissões</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for usuario in usuarios_compartilhados %}
+      <tr>
+        <td>{{ usuario.usuario.nome }} ({{ usuario.usuario.email }})</td>
+        <td>{{ usuario.permissoes }}</td>
+        <td>
+          <a href="#" class="btn btn-sm btn-danger">Revogar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="/projetos" class="btn btn-secondary">Voltar</a>
+</div>
+{% endblock %}
