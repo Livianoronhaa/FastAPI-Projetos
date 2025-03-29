@@ -32,7 +32,7 @@ async def login(
 @router.get("/logout", response_class=RedirectResponse)
 @router.post("/logout", response_class=RedirectResponse)
 async def logout(request: Request):
-    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    response = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie("access_token")
     return response
 
