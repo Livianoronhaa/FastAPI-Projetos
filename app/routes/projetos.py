@@ -26,23 +26,28 @@ async def projetos(request: Request, db: Session = Depends(get_db)):
         if user is None:
             raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
-        # Consulta corrigida
         projetos = db.query(models.Projeto).options(
-        joinedload(models.Projeto.criador)  # Note a mudança de 'usuario' para 'criador'
-    ).filter(
-        (models.Projeto.usuario_id == user.id) |
-        (models.Projeto.compartilhamentos.any(usuario_id=user.id))
-    ).all()
+            joinedload(models.Projeto.criador),
+            joinedload(models.Projeto.compartilhamentos).joinedload(models.ProjetoCompartilhado.usuario)
+        ).filter(
+            (models.Projeto.usuario_id == user.id) |
+            (models.Projeto.compartilhamentos.any(usuario_id=user.id))
+        ).all()
 
         projetos_com_tarefas = []
         for projeto in projetos:
             tarefas = crud.get_tarefas_por_projeto(db, projeto_id=projeto.id)
+            
+            compartilhado_por = []
+            if projeto.usuario_id != user.id: 
+                compartilhado_por = [projeto.criador]
+                
             projetos_com_tarefas.append({
                 "projeto": projeto,
                 "tarefas": tarefas,
-                "dono": projeto.usuario_id == user.id
+                "dono": projeto.usuario_id == user.id,
+                "compartilhado_por": compartilhado_por 
             })
-
         return templates.TemplateResponse(
             "projetos.html",
             {"request": request, "user": user, "projetos_com_tarefas": projetos_com_tarefas, "show_nav": True}
