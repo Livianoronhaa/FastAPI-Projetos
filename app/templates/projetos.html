@@ -79,6 +79,7 @@
                       Compartilhar
                     </a>
                     {% endif %}
+                    {% if projeto_tarefas.pode_editar %}
                     <a href="/projetos/{{ projeto_tarefas.projeto.id }}/editar"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-800 flex items-center">
                       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -89,6 +90,7 @@
                       </svg>
                       Editar
                     </a>
+                    {% endif %}
                     <button onclick="excluirProjeto(event, {{ projeto_tarefas.projeto.id }})"
                       class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-red-600 flex items-center">
                       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"

@@ -10,6 +10,24 @@ from ..config import templates
 
 router = APIRouter()
 
+def verificar_permissao_edicao_projeto(db: Session, user_id: int, projeto_id: int):
+    """Verifica se o usuário tem permissão para editar o projeto"""
+    projeto = db.query(models.Projeto).options(
+        joinedload(models.Projeto.compartilhamentos)
+    ).filter(
+        models.Projeto.id == projeto_id
+    ).first()
+    
+    if not projeto:
+        return False
+    
+    # É dono ou tem permissão de edição via compartilhamento
+    return (projeto.usuario_id == user_id) or any(
+        comp.usuario_id == user_id and comp.permissoes == "edicao"
+        for comp in projeto.compartilhamentos
+    )
+
+
 @router.get("/projetos", response_class=HTMLResponse)
 async def projetos(request: Request, db: Session = Depends(get_db)):
     access_token = request.cookies.get("access_token")
@@ -38,19 +56,25 @@ async def projetos(request: Request, db: Session = Depends(get_db)):
         for projeto in projetos:
             tarefas = crud.get_tarefas_por_projeto(db, projeto_id=projeto.id)
             
-            compartilhado_por = []
-            if projeto.usuario_id != user.id: 
-                compartilhado_por = [projeto.criador]
-                
+            # Verifica permissões de edição
+            pode_editar = verificar_permissao_edicao_projeto(db, user.id, projeto.id)
+            
             projetos_com_tarefas.append({
                 "projeto": projeto,
                 "tarefas": tarefas,
                 "dono": projeto.usuario_id == user.id,
-                "compartilhado_por": compartilhado_por 
+                "compartilhado_por": [projeto.criador] if projeto.usuario_id != user.id else [],
+                "pode_editar": pode_editar
             })
+
         return templates.TemplateResponse(
             "projetos.html",
-            {"request": request, "user": user, "projetos_com_tarefas": projetos_com_tarefas, "show_nav": True}
+            {
+                "request": request, 
+                "user": user, 
+                "projetos_com_tarefas": projetos_com_tarefas, 
+                "show_nav": True
+            }
         )
     except JWTError as e:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")
@@ -121,9 +145,7 @@ async def editar_projeto(
         if user is None:
             raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
-        # Verifica se o usuário é dono do projeto
-        projeto = crud.get_projeto(db, projeto_id=projeto_id)
-        if not projeto or projeto.usuario_id != user.id:
+        if not verificar_permissao_edicao_projeto(db, user.id, projeto_id):
             raise HTTPException(status_code=403, detail="Acesso negado")
 
         projeto_atualizado = schemas.ProjetoUpdate(nome=nome, descricao=descricao)
@@ -154,17 +176,24 @@ async def exibir_formulario_editar_projeto(
         if user is None:
             raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
-        projeto = crud.get_projeto(db, projeto_id=projeto_id)
-        if not projeto or projeto.usuario_id != user.id:
+        if not verificar_permissao_edicao_projeto(db, user.id, projeto_id):
             raise HTTPException(status_code=403, detail="Acesso negado")
+
+        projeto = crud.get_projeto(db, projeto_id=projeto_id)
+        if not projeto:
+            raise HTTPException(status_code=404, detail="Projeto não encontrado")
 
         return templates.TemplateResponse(
             "editar_projeto.html", 
-            {"request": request, "projeto": projeto}
+            {
+                "request": request, 
+                "projeto": projeto, 
+                "user": user
+            }
         )
     except JWTError as e:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")
-
+        
 @router.get("/projetos/{projeto_id}/compartilhar", response_class=HTMLResponse)
 async def exibir_formulario_compartilhar(
     request: Request, 
