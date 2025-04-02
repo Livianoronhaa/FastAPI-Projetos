@@ -25,6 +25,14 @@
         class="shadow appearance-none border border-purple-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-purple-500 focus:border-purple-500">{{ tarefa.descricao }}</textarea>
     </div>
 
+    <!-- Seção de Data de Entrega - Adicionada aqui -->
+    <div class="mb-4">
+      <label for="data_entrega" class="block text-gray-700 text-sm font-bold mb-2">Data de Entrega:</label>
+      <input type="date" id="data_entrega" name="data_entrega"
+        value="{{ tarefa.data_entrega.strftime('%Y-%m-%d') if tarefa.data_entrega else '' }}"
+        class="shadow appearance-none border border-purple-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+    </div>
+
     <div class="mb-4">
       <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Status:</label>
       <input type="checkbox" id="status" name="status" {% if tarefa.status %}checked{% endif %}

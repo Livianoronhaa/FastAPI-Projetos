@@ -34,7 +34,7 @@
           rows="4" placeholder="Digite a descrição da tarefa"></textarea>
       </div>
 
-      <div>
+      <div class="mb-4">
         <label for="prioridade" class="block text-sm font-medium text-gray-700">Prioridade</label>
         <select id="prioridade" name="prioridade"
           class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-purple-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md">
@@ -42,6 +42,13 @@
           <option value="media">Média</option>
           <option value="alta">Alta</option>
         </select>
+      </div>
+
+      <div class="mb-4">
+        <label for="data_entrega" class="block text-sm font-medium text-gray-700">Data de Entrega</label>
+        <input type="date" name="data_entrega" min="{{ data_atual }}" required
+          class="mt-1 block w-full px-4 py-2 border border-purple-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+          min="">
       </div>
 
       <div>

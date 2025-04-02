@@ -1,5 +1,6 @@
 from enum import Enum as PythonEnum
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, Date, Enum
+from datetime import date
 from app.database import Base
 class Prioridade(str, PythonEnum):
     BAIXA = 'baixa'
@@ -20,3 +21,10 @@ class Tarefa(Base):
         server_default='baixa',
         nullable=False
     )
+    data_entrega = Column(Date, nullable=True)
+    
+    @property
+    def atrasada(self):
+        if self.data_entrega and not self.status:
+            return self.data_entrega < date.today()
+        return False

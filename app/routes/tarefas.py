@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session, joinedload
@@ -50,10 +51,13 @@ async def exibir_formulario_criar_tarefa(
         if not verificar_acesso_projeto(db, user.id, projeto_id):
             raise HTTPException(status_code=403, detail="Acesso negado")
 
+        # Adicione a data atual no formato YYYY-MM-DD
+        data_atual = datetime.now().strftime('%Y-%m-%d')
+
         return templates.TemplateResponse("criar_tarefa.html", {
             "request": request, 
             "projeto_id": projeto_id,
-            "prioridades": ["baixa", "media", "alta"]
+            "prioridades": ["baixa", "media", "alta"],
         })
     except JWTError as e:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")
@@ -65,6 +69,7 @@ async def criar_tarefa(
     descricao: str = Form(...),
     projeto_id: int = Form(...),
     prioridade: str = Form(...),
+    data_entrega: str = Form(...),  # Adicione este parâmetro
     db: Session = Depends(get_db)
 ):
     access_token = request.cookies.get("access_token")
@@ -84,12 +89,16 @@ async def criar_tarefa(
         if not verificar_acesso_projeto(db, user.id, projeto_id):
             raise HTTPException(status_code=403, detail="Acesso negado")
 
+        # Converta a string da data para um objeto date
+        data_entrega_obj = datetime.strptime(data_entrega, '%Y-%m-%d').date()
+
         nova_tarefa = schemas.TarefaCreate(
             nome=nome,
             descricao=descricao,
             projeto_id=projeto_id,
             prioridade=prioridade,
-            usuario_id=user.id
+            usuario_id=user.id,
+            data_entrega=data_entrega_obj  # Inclua a data de entrega
         )
         crud.create_tarefa(db, nova_tarefa)
 
@@ -97,7 +106,10 @@ async def criar_tarefa(
         return RedirectResponse(url=redirect_url, status_code=303)
     except JWTError as e:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="Formato de data inválido")
 
+        
 @router.post("/tarefas/{tarefa_id}/status", response_class=RedirectResponse)
 async def atualizar_status_tarefa(
     request: Request,
@@ -173,7 +185,8 @@ async def editar_tarefa(
     nome: str = Form(...),
     descricao: str = Form(...),
     prioridade: str = Form(...),
-    status: bool = Form(...),
+    status: bool = Form(False),  # Mude para False como padrão
+    data_entrega: str = Form(None),  # Adicione este campo
     db: Session = Depends(get_db)
 ):
     access_token = request.cookies.get("access_token")
@@ -197,19 +210,26 @@ async def editar_tarefa(
         if not verificar_acesso_projeto(db, user.id, tarefa.projeto_id):
             raise HTTPException(status_code=403, detail="Acesso negado")
 
+        # Converter a data se for fornecida
+        data_entrega_obj = datetime.strptime(data_entrega, '%Y-%m-%d').date() if data_entrega else None
+
         tarefa_atualizada = schemas.TarefaUpdate(
             nome=nome, 
             descricao=descricao, 
             status=status, 
-            prioridade=prioridade
+            prioridade=prioridade,
+            data_entrega=data_entrega_obj  # Adicione este campo
         )
         crud.editar_tarefa(db, tarefa_id=tarefa_id, tarefa=tarefa_atualizada)
 
         redirect_url = f"/projetos?access_token={access_token}"
         return RedirectResponse(url=redirect_url, status_code=303)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="Formato de data inválido")
     except JWTError as e:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")
 
+        
 @router.delete("/tarefas/{tarefa_id}/excluir", response_model=schemas.Mensagem)
 def excluir_tarefa(
     request: Request,

@@ -6,7 +6,7 @@ services:
     volumes:
       - .:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:12345@db:5432/meubanco
+      - DATABASE_URL=postgresql://postgres:12345@db:5432/bancobd
     depends_on:
       db:
         condition: service_healthy
@@ -16,14 +16,14 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: meubanco
+      POSTGRES_DB: bancobd
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - '5433:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d meubanco']
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d bancobd']
       interval: 5s
       timeout: 5s
       retries: 5

@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from datetime import date
 from .. import models, schemas
 from ..auth import get_password_hash
 
@@ -73,7 +74,7 @@ def editar_projeto(db: Session, projeto_id: int, projeto: schemas.ProjetoUpdate)
     return db_projeto
 
 
-    #Tarefa
+  # Tarefa
 def get_tarefas_por_projeto(db: Session, projeto_id: int):
     return db.query(models.Tarefa).filter(models.Tarefa.projeto_id == projeto_id).all()
 
@@ -84,7 +85,8 @@ def create_tarefa(db: Session, tarefa: schemas.TarefaCreate):
         status=tarefa.status,
         projeto_id=tarefa.projeto_id,
         usuario_id=tarefa.usuario_id,
-        prioridade=tarefa.prioridade.value if hasattr(tarefa.prioridade, 'value') else tarefa.prioridade
+        prioridade=tarefa.prioridade.value if hasattr(tarefa.prioridade, 'value') else tarefa.prioridade,
+        data_entrega=tarefa.data_entrega
     )
     db.add(db_tarefa)
     db.commit()
@@ -94,9 +96,18 @@ def create_tarefa(db: Session, tarefa: schemas.TarefaCreate):
 def editar_tarefa(db: Session, tarefa_id: int, tarefa: schemas.TarefaUpdate):
     db_tarefa = db.query(models.Tarefa).filter(models.Tarefa.id == tarefa_id).first()
     if db_tarefa:
-        db_tarefa.nome = tarefa.nome
-        db_tarefa.descricao = tarefa.descricao
-        db_tarefa.status = tarefa.status
+        if tarefa.nome is not None:
+            db_tarefa.nome = tarefa.nome
+        if tarefa.descricao is not None:
+            db_tarefa.descricao = tarefa.descricao
+        if tarefa.status is not None:
+            db_tarefa.status = tarefa.status
+        if tarefa.prioridade is not None:
+            db_tarefa.prioridade = tarefa.prioridade.value if hasattr(tarefa.prioridade, 'value') else tarefa.prioridade
+        if tarefa.data_entrega is not None:
+            db_tarefa.data_entrega = tarefa.data_entrega
+        if tarefa.data_entrega is not None:
+            db_tarefa.data_entrega = tarefa.data_entrega
         db.commit()
         db.refresh(db_tarefa)
     return db_tarefa
@@ -121,7 +132,28 @@ def atualizar_status_tarefa(db: Session, tarefa_id: int, status: bool):
     db.refresh(db_tarefa)
     return True
 
+# Novas funções para filtrar tarefas por status de atraso
+def get_tarefas_atrasadas(db: Session, usuario_id: int):
+    return db.query(models.Tarefa).filter(
+        models.Tarefa.usuario_id == usuario_id,
+        models.Tarefa.status == False,
+        models.Tarefa.data_entrega < date.today()
+    ).all()
 
+def get_tarefas_para_hoje(db: Session, usuario_id: int):
+    return db.query(models.Tarefa).filter(
+        models.Tarefa.usuario_id == usuario_id,
+        models.Tarefa.status == False,
+        models.Tarefa.data_entrega == date.today()
+    ).all()
+
+def get_tarefas_por_periodo(db: Session, usuario_id: int, data_inicio: date, data_fim: date):
+    # Sua implementação aqui
+    return db.query(Tarefa).filter(
+        Tarefa.usuario_id == usuario_id,
+        Tarefa.data_entrega >= data_inicio,
+        Tarefa.data_entrega <= data_fim
+    ).all()
 
 
 def get_projetos_count(db: Session, usuario_id: int):
