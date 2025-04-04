@@ -10,10 +10,10 @@ from ..config import templates
 
 router = APIRouter()
 
-@router.get("/login", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse)
 async def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
-@router.post("/login", response_class=RedirectResponse)
+@router.post("/", response_class=RedirectResponse)
 async def login(
     email: str = Form(...),
     password: str = Form(...),
@@ -32,7 +32,7 @@ async def login(
 @router.get("/logout", response_class=RedirectResponse)
 @router.post("/logout", response_class=RedirectResponse)
 async def logout(request: Request):
-    response = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie("access_token")
     return response
 
