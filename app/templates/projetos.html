@@ -27,13 +27,6 @@
           <div
             class="flex-shrink-0 w-80 bg-white shadow border p-4 rounded-lg border-purple-100 flex flex-col min-h-fit">
 
-            <!-- Indicador de projeto compartilhado -->
-            {% if projeto_tarefas.projeto.usuario_id != user.id %} <div
-              class="absolute top-2 right-2 bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-              Compartilhado
-            </div>
-            {% endif %}
-
             <!-- Cabeçalho do projeto -->
             <div class="flex justify-between items-start mb-4">
               <div>

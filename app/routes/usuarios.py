@@ -33,6 +33,7 @@ async def perfil(
 
         # Obter estatísticas do usuário
         projetos_count = crud.get_projetos_count(db, user.id)
+        projetos_compartilhados_count = crud.get_projetos_compartilhados_count(db, user.id)  # Nova linha
         tarefas_count = crud.get_tarefas_count(db, user.id)
         tarefas_concluidas = crud.get_tarefas_concluidas_count(db, user.id)
         tarefas_pendentes = tarefas_count - tarefas_concluidas
@@ -45,6 +46,7 @@ async def perfil(
                 "request": request,
                 "user": user,
                 "projetos_count": projetos_count,
+                "projetos_compartilhados_count": projetos_compartilhados_count,  # Novo campo
                 "tarefas_count": tarefas_count,
                 "tarefas_concluidas": tarefas_concluidas,
                 "tarefas_pendentes": tarefas_pendentes,
@@ -55,7 +57,7 @@ async def perfil(
         )
     except JWTError as e:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")
-
+        
 @router.put("/usuarios/me")
 async def editar_perfil(
     usuario_update: schemas.UsuarioUpdate,

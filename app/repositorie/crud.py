@@ -148,7 +148,6 @@ def get_tarefas_para_hoje(db: Session, usuario_id: int):
     ).all()
 
 def get_tarefas_por_periodo(db: Session, usuario_id: int, data_inicio: date, data_fim: date):
-    # Sua implementação aqui
     return db.query(Tarefa).filter(
         Tarefa.usuario_id == usuario_id,
         Tarefa.data_entrega >= data_inicio,
@@ -165,7 +164,7 @@ def get_tarefas_count(db: Session, usuario_id: int):
 def get_tarefas_concluidas_count(db: Session, usuario_id: int):
     return db.query(models.Tarefa).filter(
         models.Tarefa.usuario_id == usuario_id,
-        models.Tarefa.status == True  # Note que no seu modelo o campo é 'status' não 'concluida'
+        models.Tarefa.status == True 
     ).count()
 
 def get_tarefas_por_prioridade(db: Session, usuario_id: int):
@@ -235,3 +234,21 @@ def get_projetos_do_usuario(db: Session, usuario_id: int):
     projetos_compartilhados = get_projetos_compartilhados(db, usuario_id)
     
     return projetos_proprios + projetos_compartilhados
+
+
+def calcular_projetos_compartilhados(user_id):
+    from models import Projeto, ProjetoCompartilhado
+    
+    return db.session.query(Projeto).join(
+        ProjetoCompartilhado,
+        ProjetoCompartilhado.projeto_id == Projeto.id
+    ).filter(
+        ProjetoCompartilhado.usuario_id == user_id,
+        Projeto.usuario_id != user_id
+    ).count()
+
+def get_projetos_compartilhados_count(db: Session, usuario_id: int) -> int:
+    return db.query(models.ProjetoCompartilhado).filter(
+        models.ProjetoCompartilhado.usuario_id == usuario_id,
+        models.ProjetoCompartilhado.projeto.has(models.Projeto.usuario_id != usuario_id)
+    ).count()
