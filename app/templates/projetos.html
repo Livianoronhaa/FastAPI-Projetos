@@ -7,7 +7,7 @@
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-purple-800">Olá, {{ user.nome }}, esses são seus projetos e tarefas!</h1>
 
-      <!-- Adicionar projeto -->
+      <!-- Adicionar projeto - sempre visível pois é do usuário -->
       <a href="/criar-projeto"
         class="inline-flex items-center px-4 py-2 bg-purple-800 text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -50,7 +50,8 @@
                 {% endif %}
               </div>
 
-              <!-- Menu de três pontinhos para projeto -->
+              <!-- Menu de três pontinhos para projeto - só mostra se for dono ou tiver permissão de edição -->
+              {% if projeto_tarefas.dono or projeto_tarefas.pode_editar %}
               <div class="relative">
                 <button onclick="toggleProjectMenu('project-menu-{{ projeto_tarefas.projeto.id }}', event)"
                   class="text-gray-500 hover:text-gray-700">
@@ -78,8 +79,8 @@
                     </a>
                     {% endif %}
 
-
-                    {% if projeto_tarefas.projeto.usuario_id == user.id %}
+                    <!-- Opção Compartilhar - só para dono -->
+                    {% if projeto_tarefas.dono %}
                     <a href="/projetos/{{ projeto_tarefas.projeto.id }}/compartilhar"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-800 flex items-center">
                       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -91,6 +92,7 @@
                     </a>
                     {% endif %}
 
+                    <!-- Opção Editar - só para quem pode editar -->
                     {% if projeto_tarefas.pode_editar %}
                     <a href="/projetos/{{ projeto_tarefas.projeto.id }}/editar"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-800 flex items-center">
@@ -104,6 +106,8 @@
                     </a>
                     {% endif %}
 
+                    <!-- Opção Excluir - só para dono -->
+                    {% if projeto_tarefas.dono %}
                     <button onclick="excluirProjeto(event, {{ projeto_tarefas.projeto.id }})"
                       class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-red-600 flex items-center">
                       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -114,9 +118,11 @@
                       </svg>
                       Excluir
                     </button>
+                    {% endif %}
                   </div>
                 </div>
               </div>
+              {% endif %}
             </div>
 
             <!-- Lista de tarefas com scroll -->
@@ -126,9 +132,9 @@
                 class="relative p-3 rounded-lg bg-gray-50 border border-gray-100 hover:bg-purple-100 transition-colors">
                 <!-- Linha de prioridade no topo -->
                 <div class="absolute top-0 left-0 right-0 h-2 rounded-t-lg 
-      {% if tarefa.prioridade == 'alta' %}bg-red-500
-      {% elif tarefa.prioridade == 'media' %}bg-yellow-500
-      {% else %}bg-blue-500{% endif %}">
+                  {% if tarefa.prioridade == 'alta' %}bg-red-500
+                  {% elif tarefa.prioridade == 'media' %}bg-yellow-500
+                  {% else %}bg-blue-500{% endif %}">
                 </div>
 
                 <div class="pt-4">
@@ -178,7 +184,8 @@
                         {% endif %}
                       </div>
                     </div>
-                    <!-- Menu de três pontinhos para tarefa -->
+                    <!-- Menu de três pontinhos para tarefa - só mostra se puder editar -->
+                    {% if projeto_tarefas.pode_editar %}
                     <div class="relative">
                       <button onclick="toggleTaskMenu('task-menu-{{ tarefa.id }}', event)"
                         class="text-gray-500 hover:text-gray-700">
@@ -216,12 +223,15 @@
                         </div>
                       </div>
                     </div>
+                    {% endif %}
                   </div>
                 </div>
               </div>
               {% endfor %}
             </div>
 
+            <!-- Botão de adicionar tarefa - só mostra se puder editar -->
+            {% if projeto_tarefas.pode_editar %}
             <div class="mt-auto">
               <a href="/criar-tarefa?projeto_id={{ projeto_tarefas.projeto.id }}"
                 class="w-full flex items-center justify-center px-3 py-2 text-sm bg-purple-100 text-purple-600 hover:bg-purple-200 rounded-lg transition-colors border border-purple-200">
@@ -232,6 +242,7 @@
                 Adicionar item
               </a>
             </div>
+            {% endif %}
           </div>
           {% endfor %}
         </div>
