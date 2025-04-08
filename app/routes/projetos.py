@@ -315,3 +315,50 @@ async def listar_compartilhamentos(
         )
     except JWTError as e:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")
+
+@router.delete("/projetos/{projeto_id}/revogar-acesso/{usuario_id}", response_model=schemas.Mensagem)
+async def revogar_acesso_projeto(
+    request: Request,
+    projeto_id: int,
+    usuario_id: int,
+    db: Session = Depends(get_db)
+):
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Token de acesso não fornecido")
+
+    try:
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=401, detail="Token inválido")
+
+        user = crud.get_usuario_by_email(db, email=email)
+        if user is None:
+            raise HTTPException(status_code=401, detail="Usuário não encontrado")
+
+        # Verifica se o projeto pertence ao usuário
+        projeto = crud.get_projeto(db, projeto_id=projeto_id)
+        if not projeto or projeto.usuario_id != user.id:
+            raise HTTPException(status_code=403, detail="Apenas o dono do projeto pode revogar acessos")
+
+        # Verifica se o compartilhamento existe
+        compartilhamento = db.query(models.ProjetoCompartilhado).filter(
+            models.ProjetoCompartilhado.projeto_id == projeto_id,
+            models.ProjetoCompartilhado.usuario_id == usuario_id
+        ).first()
+
+        if not compartilhamento:
+            raise HTTPException(status_code=404, detail="Compartilhamento não encontrado")
+
+        # Remove o compartilhamento
+        db.delete(compartilhamento)
+        db.commit()
+
+        return {"mensagem": "Acesso revogado com sucesso"}
+        
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro ao revogar acesso: {str(e)}")

@@ -252,3 +252,17 @@ def get_projetos_compartilhados_count(db: Session, usuario_id: int) -> int:
         models.ProjetoCompartilhado.usuario_id == usuario_id,
         models.ProjetoCompartilhado.projeto.has(models.Projeto.usuario_id != usuario_id)
     ).count()
+
+
+def revogar_compartilhamento_projeto(db: Session, projeto_id: int, usuario_id: int) -> bool:
+    compartilhamento = db.query(models.ProjetoCompartilhado).filter(
+        models.ProjetoCompartilhado.projeto_id == projeto_id,
+        models.ProjetoCompartilhado.usuario_id == usuario_id
+    ).first()
+    
+    if not compartilhamento:
+        return False
+    
+    db.delete(compartilhamento)
+    db.commit()
+    return True

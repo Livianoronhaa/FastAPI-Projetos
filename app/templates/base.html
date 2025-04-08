@@ -17,7 +17,8 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center space-x-4">
                     <div class="flex justify-center">
-                        <img src="/static/assets/logo1.svg" class="w-28 m-4 mr-12" alt="">
+                        <img src="/static/assets/logo1.svg"
+                            class="w-20 md:w-28 m-2 md:m-4 mr-6 md:mr-12 transition-all duration-200" alt="Logo">
                     </div> <a href="/projetos"
                         class="{{ 'bg-purple-600 text-white' if request.url.path.startswith('/projetos') else 'text-gray-700 hover:bg-purple-50' }} px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
                         <i class="fas fa-project-diagram"></i>Projetos

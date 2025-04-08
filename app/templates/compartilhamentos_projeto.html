@@ -49,7 +49,8 @@
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <button class="px-3 py-1 text-sm text-red-600 hover:text-red-900 focus:outline-none">
+              <button onclick="revogarAcesso('{{ projeto.id }}', '{{ usuario.usuario.id }}')"
+                class="px-3 py-1 text-sm text-red-600 hover:text-red-900 focus:outline-none">
                 Revogar
               </button>
             </td>
@@ -71,4 +72,33 @@
     </div>
   </div>
 </div>
+
+<script>
+  async function revogarAcesso(projetoId, usuarioId) {
+    if (!confirm('Tem certeza que deseja revogar o acesso deste usuário ao projeto?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/projetos/${projetoId}/revogar-acesso/${usuarioId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      });
+
+      if (response.ok) {
+        alert('Acesso revogado com sucesso!');
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        alert(`Erro ao revogar acesso: ${error.detail || 'Erro desconhecido'}`);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro ao revogar acesso. Por favor, tente novamente.');
+    }
+  }
+</script>
 {% endblock %}
