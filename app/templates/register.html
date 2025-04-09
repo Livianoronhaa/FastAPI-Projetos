@@ -2,10 +2,16 @@
 
 {% block content %}
 <div class="min-h-screen flex flex-col items-center justify-center bg-purple-100">
-    <h1 class="text-2xl font-bold text-center mb-6 text-purple-800">Cadastre-se e organize seus projetos!</h1>
+    <div
+        class="w-full max-w-md bg-gradient-to-r from-purple-600 to-pink-500 p-8 rounded-lg shadow-lg mb-6 text-white text-center">
+        <h1 class="text-xl font-bold mb-2">Cadastre-se e organize seus projetos!</h1>
+        <p class="text-sm">Taskflow é o seu ambiente de organização perfeito!</p>
+    </div>
 
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 class="text-2xl font-bold text-center mb-6 text-purple-800">Cadastro</h1>
+        <div class="flex justify-center">
+            <img src="/static/assets/logo1.svg" class="w-36 m-4" alt="">
+        </div>
         <form action="/register" method="post" class="space-y-6">
             <div>
                 <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
@@ -33,7 +39,7 @@
             </div>
         </form>
         <div class="mt-6 text-center">
-            <a href="/" class="text-sm text-purple-400 hover:text-purple-300">
+            <a href="/" class="text-sm text-purple-800 hover:text-purple-300">
                 Já tenho uma conta
             </a>
         </div>

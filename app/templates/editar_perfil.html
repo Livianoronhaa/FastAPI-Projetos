@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-purple-100 p-8">
+  <!-- Botão para voltar -->
+  <button onclick="window.history.back()"
+    class="inline-flex items-center px-4 py-2 text-purple-400 font-regular rounded-md hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-6">
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Voltar
+  </button>
+
+  <!-- Container principal -->
+  <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+    <h1 class="text-2xl font-bold text-purple-800 mb-6 text-center">Editar Perfil</h1>
+
+    <form id="editProfileForm" class="space-y-4">
+      <!-- Campo Nome -->
+      <div>
+        <label for="nome" class="block text-sm font-medium text-purple-700">Nome</label>
+        <input type="text" id="nome" name="nome" value="{{ current_user.nome }}"
+          class="mt-1 block w-full px-3 py-2 border border-purple-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+      </div>
+
+      <!-- Campo Email -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-purple-700">Email</label>
+        <input type="email" id="email" name="email" value="{{ current_user.email }}"
+          class="mt-1 block w-full px-3 py-2 border border-purple-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+      </div>
+
+      <!-- Campo Senha -->
+      <div>
+        <label for="senha" class="block text-sm font-medium text-purple-700">Nova Senha (deixe em branco para não
+          alterar)</label>
+        <input type="password" id="senha" name="senha"
+          class="mt-1 block w-full px-3 py-2 border border-purple-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+      </div>
+
+      <!-- Botão de submit -->
+      <div class="pt-4">
+        <button type="submit"
+          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+          Salvar Alterações
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById('editProfileForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = {
+      nome: document.getElementById('nome').value,
+      email: document.getElementById('email').value,
+      senha: document.getElementById('senha').value
+    };
+
+    try {
+      const response = await fetch('/usuarios/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert('Perfil atualizado com sucesso!');
+        window.location.href = '/perfil'; // Redireciona para a página de perfil
+      } else {
+        const errorData = await response.json();
+        alert(`Erro ao atualizar perfil: ${errorData.detail || 'Erro desconhecido'}`);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro ao conectar com o servidor');
+    }
+  });
+</script>
+{% endblock %}

@@ -5,7 +5,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from .database import get_db
-from . import crud, schemas
+from . import schemas
+from app.repositorie import crud
 import os
 from dotenv import load_dotenv
 
@@ -38,12 +39,22 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("sub")
-        if user_id is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return user_id
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
     except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise credentials_exception
+    
+    user = crud.get_usuario_by_email(db, email=email)
+    if user is None:
+        raise credentials_exception
+    return user

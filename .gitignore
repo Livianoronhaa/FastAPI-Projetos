@@ -7,8 +7,6 @@ postgres-db/
 
 *.log
 
-.env
-
 *.pyc
 *.pyo
 *.pyd

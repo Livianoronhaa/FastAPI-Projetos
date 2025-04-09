@@ -25,10 +25,28 @@
         class="shadow appearance-none border border-purple-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-purple-500 focus:border-purple-500">{{ tarefa.descricao }}</textarea>
     </div>
 
+    <!-- Seção de Data de Entrega - Adicionada aqui -->
+    <div class="mb-4">
+      <label for="data_entrega" class="block text-gray-700 text-sm font-bold mb-2">Data de Entrega:</label>
+      <input type="date" id="data_entrega" name="data_entrega"
+        value="{{ tarefa.data_entrega.strftime('%Y-%m-%d') if tarefa.data_entrega else '' }}"
+        class="shadow appearance-none border border-purple-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+    </div>
+
     <div class="mb-4">
       <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Status:</label>
       <input type="checkbox" id="status" name="status" {% if tarefa.status %}checked{% endif %}
         class="form-checkbox h-5 w-5 text-purple-600 focus:ring-purple-500">
+    </div>
+
+    <div class="mb-4">
+      <label for="prioridade" class="block text-sm font-medium text-gray-700">Prioridade</label>
+      <select id="prioridade" name="prioridade"
+        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-purple-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md">
+        <option value="baixa" {% if tarefa.prioridade=='baixa' %}selected{% endif %}>Baixa</option>
+        <option value="media" {% if tarefa.prioridade=='media' %}selected{% endif %}>Média</option>
+        <option value="alta" {% if tarefa.prioridade=='alta' %}selected{% endif %}>Alta</option>
+      </select>
     </div>
 
     <button type="submit"
