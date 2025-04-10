@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Projeto</title>
     <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -22,14 +22,16 @@
                     <div class="flex justify-center">
                         <img src="/static/assets/logo1.svg"
                             class="w-20 md:w-28 m-2 md:m-4 mr-6 md:mr-12 transition-all duration-200" alt="Logo">
-                    </div> <a href="/projetos"
+                    </div>
+                    <a href="/projetos"
                         class="{{ 'bg-purple-600 text-white' if request.url.path.startswith('/projetos') else 'text-gray-700 hover:bg-purple-50' }} px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        <i class="fas fa-project-diagram"></i>Projetos
+                        <i class="fas fa-project-diagram mr-2"></i>Projetos
                     </a>
                     <a href="/perfil"
                         class="{{ 'bg-purple-600 text-white' if request.url.path.startswith('/perfil') else 'text-gray-700 hover:bg-purple-50' }} px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                        <i class="fas fa-user"></i>Perfil
+                        <i class="fas fa-user mr-2"></i>Perfil
                     </a>
+
                 </div>
 
                 <div class="flex items-center space-x-4">
@@ -43,8 +45,9 @@
                         <form action="/logout" method="post" class="ml-2">
                             <button type="submit"
                                 class="flex items-center text-red-600 hover:text-red-800 text-sm font-medium transition duration-150 ease-in-out">
-                                <i class="fas fa-sign-out-alt mr-1"></i> Sair
+                                <i class="fas fa-sign-out-alt mr-2"></i> Sair
                             </button>
+
                         </form>
                     </div>
                 </div>
