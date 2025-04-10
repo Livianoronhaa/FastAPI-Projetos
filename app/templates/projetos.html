@@ -3,38 +3,63 @@
 {% block content %}
 <div class="min-h-screen bg-purple-50 p-8">
   <div class="max-w-full mx-auto bg-white border-gray-100 p-6 shadow rounded-lg overflow-hidden">
-    <!-- Cabeçalho modificado para ser responsivo -->
     <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
-      <h1 class="text-2xl font-bold text-purple-800 mb-4 md:mb-0">Olá, {{ user.nome }}, esses são seus projetos e
-        tarefas!</h1>
+      <div class="flex flex-col">
+        <h1 class="text-2xl font-bold text-purple-800 mb-4 md:mb-0">Olá, {{ user.nome }}!</h1>
+        <p class="text-lg font-medium text-gray-600 mb-2">Acompanhe seus projetos e tarefas e comece a gerenciá-los!</p>
+      </div>
 
-      <!-- Adicionar projeto - sempre visível pois é do usuário -->
-      <a href="/criar-projeto"
-        class="inline-flex items-center px-4 py-2 bg-purple-800 text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 w-full md:w-auto justify-center">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-        </svg>
-        Adicionar Projeto
-      </a>
+      <div class="flex flex-col sm:flex-row gap-2 mt-4 md:mt-0">
+        <!-- Adicionar projeto -->
+        <a href="/criar-projeto"
+          class="inline-flex items-center px-4 py-2 bg-purple-800 text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 w-full md:w-auto justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Adicionar Projeto
+        </a>
+        <button id="gerar-relatorio-btn"
+          class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 w-full md:w-auto justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+            </path>
+          </svg>
+          Baixar relatório geral
+        </button>
+      </div>
     </div>
 
-    <!-- Restante do código permanece igual -->
     <div class="p-6 bg-gray-50 border border-gray-100 rounded-lg">
+      <!-- Verifica se há projetos -->
+      {% if projetos_com_tarefas|length == 0 %}
+      <div class="text-center py-10">
+        <p class="text-lg font-medium text-gray-600">Cadastre seu primeiro projeto!</p>
+        <a href="/criar-projeto"
+          class="mt-4 inline-flex items-center px-4 py-2 bg-purple-800 text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Criar Projeto
+        </a>
+      </div>
+      {% else %}
       <!-- Container dos projetos com scroll horizontal -->
       <div class="relative">
         <div class="flex overflow-x-auto pb-4 space-x-4" style="scrollbar-width: thin;">
           {% for projeto_tarefas in projetos_com_tarefas %}
           <!-- Coluna de projeto -->
           <div
-            class="flex-shrink-0 w-80 bg-white shadow border p-4 rounded-lg border-purple-100 flex flex-col min-h-fit">
-
+            class="flex-shrink-0 w-80 bg-white shadow border p-4 rounded-lg border-purple-100 flex flex-col min-h-fit"
+            data-projeto-id="{{ projeto_tarefas.projeto.id }}">
             <!-- Cabeçalho do projeto -->
             <div class="flex justify-between items-start mb-4">
               <div>
                 <h2 class="text-xl font-semibold text-purple-800">{{ projeto_tarefas.projeto.nome }}</h2>
                 <p class="text-gray-600 text-sm">{{ projeto_tarefas.projeto.descricao }}</p>
-
                 <!-- Informação de compartilhamento -->
                 {% if not projeto_tarefas.dono and projeto_tarefas.compartilhado_por %}
                 <div class="text-xs text-gray-500 mt-1">
@@ -51,8 +76,7 @@
                 </div>
                 {% endif %}
               </div>
-
-              <!-- Menu de três pontinhos para projeto - só mostra se for dono ou tiver permissão de edição -->
+              <!-- Menu de três pontinhos para projeto -->
               {% if projeto_tarefas.dono or projeto_tarefas.pode_editar %}
               <div class="relative">
                 <button onclick="toggleProjectMenu('project-menu-{{ projeto_tarefas.projeto.id }}', event)"
@@ -63,12 +87,10 @@
                     </path>
                   </svg>
                 </button>
-
                 <!-- Menu dropdown -->
                 <div id="project-menu-{{ projeto_tarefas.projeto.id }}"
                   class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                   <div class="py-1">
-                    <!-- Opção Ver Membros -->
                     {% if projeto_tarefas.pode_editar %}
                     <a href="/projetos/{{ projeto_tarefas.projeto.id }}/compartilhados"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-800 flex items-center">
@@ -80,8 +102,6 @@
                       Ver membros
                     </a>
                     {% endif %}
-
-                    <!-- Opção Compartilhar - só para dono -->
                     {% if projeto_tarefas.dono %}
                     <a href="/projetos/{{ projeto_tarefas.projeto.id }}/compartilhar"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-800 flex items-center">
@@ -93,8 +113,6 @@
                       Compartilhar
                     </a>
                     {% endif %}
-
-                    <!-- Opção Editar - só para quem pode editar -->
                     {% if projeto_tarefas.pode_editar %}
                     <a href="/projetos/{{ projeto_tarefas.projeto.id }}/editar"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-800 flex items-center">
@@ -107,8 +125,6 @@
                       Editar
                     </a>
                     {% endif %}
-
-                    <!-- Opção Excluir - só para dono -->
                     {% if projeto_tarefas.dono %}
                     <button onclick="excluirProjeto(event, {{ projeto_tarefas.projeto.id }})"
                       class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-red-600 flex items-center">
@@ -121,34 +137,47 @@
                       Excluir
                     </button>
                     {% endif %}
+                    <button onclick="gerarRelatorioProjeto({{ projeto_tarefas.projeto.id }})"
+                      class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-800 flex items-center">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                      </svg>
+                      Baixar Relatório
+                    </button>
                   </div>
                 </div>
               </div>
               {% endif %}
             </div>
 
-            <!-- Lista de tarefas com scroll -->
+            <!-- Lista de tarefas com mensagem condicional -->
             <div class="space-y-2 mb-4">
+              {% if projeto_tarefas.tarefas|length == 0 %}
+              <div class="text-center py-4">
+                <p class="text-sm text-gray-600">Nenhuma tarefa cadastrada</p>
+              </div>
+              {% else %}
               {% for tarefa in projeto_tarefas.tarefas %}
               <div
                 class="relative p-3 rounded-lg bg-gray-50 border border-gray-100 hover:bg-purple-100 transition-colors">
                 <!-- Linha de prioridade no topo -->
                 <div class="absolute top-0 left-0 right-0 h-2 rounded-t-lg 
-                  {% if tarefa.prioridade == 'alta' %}bg-red-500
-                  {% elif tarefa.prioridade == 'media' %}bg-yellow-500
-                  {% else %}bg-blue-500{% endif %}">
+                    {% if tarefa.prioridade == 'alta' %}bg-red-500
+                    {% elif tarefa.prioridade == 'media' %}bg-yellow-500
+                    {% else %}bg-blue-500{% endif %}">
                 </div>
-
                 <div class="pt-4">
                   <div class="flex items-start justify-between">
-                    <!-- Checkbox e texto da tarefa -->
                     <div class="flex items-start space-x-2">
                       <form action="/tarefas/{{ tarefa.id }}/status" method="post" class="mt-1">
                         <input type="hidden" name="status" value="{{ not tarefa.status }}">
                         <button type="submit" class="focus:outline-none">
                           <div class="w-5 h-5 flex items-center justify-center rounded border-2 
-                                  {% if tarefa.status %}bg-purple-600 border-purple-600{% else %}bg-white border-purple-400{% endif %} 
-                                  transition-colors duration-200">
+                                    {% if tarefa.status %}bg-purple-600 border-purple-600{% else %}bg-white border-purple-400{% endif %} 
+                                    transition-colors duration-200">
                             <svg class="w-3 h-3 {% if tarefa.status %}text-white{% else %}text-purple-600{% endif %}"
                               viewBox="0 0 20 20" fill="currentColor">
                               <path fill-rule="evenodd"
@@ -158,7 +187,6 @@
                           </div>
                         </button>
                       </form>
-
                       <div>
                         <p
                           class="text-purple-800 font-medium {% if tarefa.status %}line-through text-gray-500{% endif %}">
@@ -171,7 +199,6 @@
                         <p class="text-xs text-gray-600 {% if tarefa.status %}line-through{% endif %}">
                           {{ tarefa.descricao }}
                         </p>
-                        <!-- Data de entrega -->
                         {% if tarefa.data_entrega %}
                         <div
                           class="mt-1 flex items-center text-xs {% if tarefa.atrasada %}text-red-600{% else %}text-gray-500{% endif %}">
@@ -186,7 +213,6 @@
                         {% endif %}
                       </div>
                     </div>
-                    <!-- Menu de três pontinhos para tarefa - só mostra se puder editar -->
                     {% if projeto_tarefas.pode_editar %}
                     <div class="relative">
                       <button onclick="toggleTaskMenu('task-menu-{{ tarefa.id }}', event)"
@@ -197,8 +223,6 @@
                           </path>
                         </svg>
                       </button>
-
-                      <!-- Menu dropdown -->
                       <div id="task-menu-{{ tarefa.id }}"
                         class="hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                         <div class="py-1">
@@ -230,6 +254,7 @@
                 </div>
               </div>
               {% endfor %}
+              {% endif %}
             </div>
 
             <!-- Botão de adicionar tarefa - só mostra se puder editar -->
@@ -249,6 +274,7 @@
           {% endfor %}
         </div>
       </div>
+      {% endif %}
     </div>
 
   </div>
@@ -283,63 +309,7 @@
 
 <script>
 
-  // Variáveis globais para o modal
-  let currentAction = null;
-  let currentId = null;
-
-  // Função para abrir o modal
-  function openModal(title, message, action, id) {
-    currentAction = action;
-    currentId = id;
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalMessage').textContent = message;
-    document.getElementById('confirmModal').classList.remove('hidden');
-  }
-
-  // Função para fechar o modal
-  function closeModal() {
-    document.getElementById('confirmModal').classList.add('hidden');
-    currentAction = null;
-    currentId = null;
-  }
-
-  // Função para executar a ação confirmada
-  function executeAction() {
-    if (currentAction === 'deleteProject') {
-      deleteProject(currentId);
-    } else if (currentAction === 'deleteTask') {
-      deleteTask(currentId);
-    }
-    closeModal();
-  }
-
-  // Atribui a função ao botão de confirmar
-  document.getElementById('confirmAction').addEventListener('click', executeAction);
-
-  // Funções modificadas para usar o modal
-  function excluirProjeto(event, projetoId) {
-    event.preventDefault();
-    event.stopPropagation();
-    openModal(
-      'Excluir Projeto',
-      'Tem certeza que deseja excluir este projeto? Todas as tarefas relacionadas também serão removidas.',
-      'deleteProject',
-      projetoId
-    );
-  }
-
-  function excluirTarefa(event, tarefaId) {
-    event.preventDefault();
-    event.stopPropagation();
-    openModal(
-      'Excluir Tarefa',
-      'Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.',
-      'deleteTask',
-      tarefaId
-    );
-  }
-
-  // Funções de exclusão (antigas funções modificadas)
+  // Funções de exclusão
   function deleteProject(projetoId) {
     fetch(`/projetos/${projetoId}/excluir`, {
       method: 'DELETE',
@@ -381,7 +351,6 @@
     }
   });
 
-  // Mantenha as outras funções existentes (toggleProjectMenu, toggleTaskMenu, etc.)
   // Função para alternar o menu do projeto
   function toggleProjectMenu(menuId, event) {
     event.stopPropagation(); // Impede a propagação do evento
@@ -461,6 +430,275 @@
         })
         .catch(error => console.error('Erro:', error));
     }
+  }
+
+  function gerarRelatorioComJsPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Configurações iniciais
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(18);
+    doc.text('Relatório de Projetos e Tarefas', 14, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30);
+
+    const projetos = obterTodosProjetos();
+    let yPos = 40;
+
+    projetos.forEach((projeto) => {
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      // Cabeçalho do projeto
+      doc.setFontSize(14);
+      doc.setTextColor(40, 53, 147);
+      doc.text(`Projeto: ${projeto.nome}`, 14, yPos);
+
+      // Descrição
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      const descLines = doc.splitTextToSize(`Descrição: ${projeto.descricao}`, 180);
+      doc.text(descLines, 14, yPos + 8);
+
+      // Preparar dados da tabela
+      const tarefasData = projeto.tarefas.map(tarefa => [
+        tarefa.nome,
+        tarefa.status ? 'Concluída' : 'Pendente',
+        tarefa.prioridade,
+        tarefa.data_entrega || 'Sem data',
+        tarefa.atrasada ? 'Atrasada' : (tarefa.status ? '-' : 'No prazo')
+      ]);
+
+      // Tabela de tarefas
+      doc.autoTable({
+        startY: yPos + 8 + (descLines.length * 5) + 5,
+        head: [['Tarefa', 'Status', 'Prioridade', 'Data Entrega', 'Situação']],
+        body: tarefasData,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [79, 70, 229],
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        columnStyles: {
+          0: { cellWidth: 'auto', fontStyle: 'bold' },
+          1: { cellWidth: 30 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: 25 }
+        },
+        styles: {
+          font: 'helvetica',
+          fontSize: 10,
+          cellPadding: 3,
+          overflow: 'linebreak'
+        },
+        didDrawCell: (data) => {
+          if (data.column.index === 4 && data.cell.raw === 'Atrasada') {
+            doc.setTextColor(255, 0, 0);
+            doc.text(data.cell.raw, data.cell.x + 3, data.cell.y + 8);
+            data.cell.styles.textColor = [255, 0, 0];
+            return false
+          }
+        }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 10;
+
+      // Estatísticas
+      const total = projeto.tarefas.length;
+      const concluidas = projeto.tarefas.filter(t => t.status).length;
+      const atrasadas = projeto.tarefas.filter(t => t.atrasada).length;
+
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        `Resumo: ${concluidas} concluídas (${Math.round((concluidas / total) * 100)}%) | ` +
+        `${atrasadas} atrasadas (${Math.round((atrasadas / total) * 100)}%)`,
+        14,
+        yPos
+      );
+
+      yPos += 15;
+    });
+
+    doc.save('relatorio_projetos.pdf');
+  }
+
+  function obterTodosProjetos() {
+    const projetos = [];
+
+    document.querySelectorAll('[data-projeto-id]').forEach(projetoEl => {
+      const projeto = {
+        id: projetoEl.getAttribute('data-projeto-id'),
+        nome: projetoEl.querySelector('h2.text-xl').textContent.trim(),
+        descricao: projetoEl.querySelector('p.text-gray-600.text-sm').textContent.trim(),
+        tarefas: []
+      };
+
+      projetoEl.querySelectorAll('.bg-gray-50.border').forEach(tarefaEl => {
+        const nomeElement = tarefaEl.querySelector('.text-purple-800.font-medium');
+        const statusElement = tarefaEl.querySelector('.bg-purple-600');
+        const dataElement = tarefaEl.querySelector('.flex.items-center.text-xs');
+
+        let dataEntrega = null;
+        let atrasada = false;
+
+        if (dataElement && dataElement.textContent.includes('Entrega:')) {
+          const dataTexto = dataElement.textContent.replace('Entrega:', '').trim();
+          if (dataTexto) {
+            dataEntrega = dataTexto;
+            if (!statusElement && dataElement.classList.contains('text-red-600')) {
+              atrasada = true;
+            }
+          }
+        }
+
+        projeto.tarefas.push({
+          nome: nomeElement ? nomeElement.textContent.replace(/Atrasada/g, '').trim() : 'Sem nome',
+          descricao: tarefaEl.querySelector('p.text-xs.text-gray-600')?.textContent.trim() || '',
+          status: !!statusElement,
+          prioridade: getPrioridadeTarefa(tarefaEl),
+          data_entrega: dataEntrega,
+          atrasada: atrasada
+        });
+      });
+
+      projetos.push(projeto);
+    });
+
+    return projetos;
+  }
+
+  // Função auxiliar para detectar prioridade (mantida da versão anterior)
+  function getPrioridadeTarefa(tarefaEl) {
+    const prioridadeEl = tarefaEl.querySelector('.absolute.top-0');
+    if (!prioridadeEl) return 'Não definida';
+
+    if (prioridadeEl.classList.contains('bg-red-500')) return 'Alta';
+    if (prioridadeEl.classList.contains('bg-yellow-500')) return 'Média';
+    if (prioridadeEl.classList.contains('bg-blue-500')) return 'Baixa';
+    return 'Não definida';
+  }
+
+  document.getElementById('gerar-relatorio-btn').addEventListener('click', gerarRelatorioComJsPDF);
+
+
+  // Função para gerar relatório de um projeto específico
+  function gerarRelatorioProjeto(projetoId) {
+    const projeto = obterDadosProjeto(projetoId);
+    if (!projeto) {
+      alert('Projeto não encontrado');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Cabeçalho
+    doc.setFontSize(18);
+    doc.text(`Relatório do Projeto: ${projeto.nome}`, 14, 20);
+    doc.setFontSize(12);
+    doc.text(`Descrição: ${projeto.descricao}`, 14, 30);
+    doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 40);
+
+    // Dados das tarefas
+    const tarefasData = projeto.tarefas.map(tarefa => [
+      tarefa.nome,
+      tarefa.status ? 'Concluída' : 'Pendente',
+      tarefa.prioridade,
+      tarefa.data_entrega || 'Sem data',
+      tarefa.atrasada ? 'Atrasada' : (tarefa.status ? '-' : 'No prazo')
+    ]);
+
+    // Tabela
+    doc.autoTable({
+      startY: 50,
+      head: [['Tarefa', 'Status', 'Prioridade', 'Data Entrega', 'Situação']],
+      body: tarefasData,
+      headStyles: {
+        fillColor: [79, 70, 229],
+        textColor: 255
+      },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: 25 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 }
+      }
+    });
+
+    // Resumo
+    const finalY = doc.lastAutoTable.finalY + 15;
+    doc.setFontSize(14);
+    doc.text('Resumo:', 14, finalY);
+
+    const total = projeto.tarefas.length;
+    const concluidas = projeto.tarefas.filter(t => t.status).length;
+    const atrasadas = projeto.tarefas.filter(t => t.atrasada).length;
+
+    doc.setFontSize(12);
+    doc.text(`Total de Tarefas: ${total}`, 14, finalY + 10);
+    doc.text(`Concluídas: ${concluidas} (${Math.round((concluidas / total) * 100)}%)`, 14, finalY + 20);
+    doc.text(`Atrasadas: ${atrasadas} (${Math.round((atrasadas / total) * 100)}%)`, 14, finalY + 30);
+
+    doc.save(`relatorio_${projeto.nome.replace(/\s+/g, '_')}.pdf`);
+  }
+
+  // Função para obter dados de um projeto específico
+  function obterDadosProjeto(projetoId) {
+    const projetoEl = document.querySelector(`[data-projeto-id="${projetoId}"]`);
+    if (!projetoEl) return null;
+
+    const projeto = {
+      id: projetoId,
+      nome: projetoEl.querySelector('h2.text-xl').textContent.trim(),
+      descricao: projetoEl.querySelector('p.text-gray-600.text-sm').textContent.trim(),
+      tarefas: []
+    };
+
+    projetoEl.querySelectorAll('.bg-gray-50.border').forEach(tarefaEl => {
+      const nomeElement = tarefaEl.querySelector('.text-purple-800.font-medium');
+      const statusElement = tarefaEl.querySelector('.bg-purple-600');
+      const dataElement = tarefaEl.querySelector('.flex.items-center.text-xs');
+
+      let dataEntrega = null;
+      let atrasada = false;
+
+      if (dataElement && dataElement.textContent.includes('Entrega:')) {
+        const dataTexto = dataElement.textContent.replace('Entrega:', '').trim();
+        if (dataTexto) {
+          dataEntrega = dataTexto;
+          // Verificação de atraso
+          if (!statusElement && dataElement.classList.contains('text-red-600')) {
+            atrasada = true;
+          }
+        }
+      }
+
+      projeto.tarefas.push({
+        nome: nomeElement ? nomeElement.textContent.replace(/Atrasada/g, '').trim() : 'Sem nome',
+        status: !!statusElement,
+        prioridade: getPrioridadeTarefa(tarefaEl),
+        data_entrega: dataEntrega,
+        atrasada: atrasada
+      });
+    });
+
+    return projeto;
+  }
+
+  // Função auxiliar para detectar prioridade
+  function getPrioridadeTarefa(tarefaEl) {
+    const prioridadeEl = tarefaEl.querySelector('.absolute.top-0');
+    if (prioridadeEl.classList.contains('bg-red-500')) return 'Alta';
+    if (prioridadeEl.classList.contains('bg-yellow-500')) return 'Média';
+    return 'Baixa';
   }
 </script>
 
